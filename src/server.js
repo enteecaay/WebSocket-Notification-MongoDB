@@ -24,6 +24,7 @@ wss.on("connection", (ws, req) => {
 
   if (!userId) {
     console.error("❌ Connection rejected: userId is missing");
+    ws.close(); // Close the connection if userId is missing
     return;
   }
 
