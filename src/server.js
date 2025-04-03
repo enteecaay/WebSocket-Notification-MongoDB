@@ -19,7 +19,15 @@ const clients = new Map();
 
 // WebSocket connection logic
 wss.on("connection", (ws, req) => {
-  const userId = req.url.split("?userId=")[1]; // Extract userId from query params
+  const urlParams = new URLSearchParams(req.url.split("?")[1]); // Parse query params
+  const userId = urlParams.get("userId"); // Get userId from query params
+
+  if (!userId) {
+    console.error("❌ Connection rejected: userId is missing");
+    ws.close(); // Close the connection if userId is missing
+    return;
+  }
+
   clients.set(userId, ws);
   console.log(`🔌 User ${userId} connected`);
 
@@ -70,9 +78,11 @@ app.put("/notifications/read/:userId", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
 app.get("/", (req, res) => {
   res.send("WebSocket server is running!");
 });
+
 const PORT = process.env.PORT || 8080;
 server.listen(PORT, () =>
   console.log(`🚀 WebSocket Server running on ws://localhost:${PORT}`)
