@@ -55,4 +55,38 @@ function setupWebSocket(server) {
   });
 }
 
-module.exports = { setupWebSocket };
+/**
+ * Mark all unread notifications as read for a specific user.
+ */
+async function markNotificationsAsRead(req, res) {
+  try {
+    const { userId } = req.params;
+
+    if (!userId) {
+      return res.status(400).json({ error: "User ID is required" });
+    }
+
+    const result = await Notification.updateMany(
+      { userId, status: "unread" },
+      { $set: { status: "read" } }
+    );
+
+    if (result.modifiedCount === 0) {
+      return res.status(404).json({ message: "No unread notifications found" });
+    }
+
+    console.log(
+      `Marked ${result.modifiedCount} notifications as read for user ${userId}`
+    );
+
+    res.json({
+      message: "All notifications marked as read",
+      modifiedCount: result.modifiedCount,
+    });
+  } catch (error) {
+    console.error("Error marking notifications as read:", error.message);
+    res.status(500).json({ error: error.message });
+  }
+}
+
+module.exports = { setupWebSocket, markNotificationsAsRead };

@@ -4,9 +4,11 @@ const http = require("http");
 const cors = require("cors");
 const connectDB = require("./db/dbConnect"); // Import the database connection
 const { setupWebSocket } = require("./service/notiService"); // Import WebSocket service
+const { markNotificationsAsRead } = require("./service/notificationService"); // Import notification service
 
 const app = express();
 app.use(cors());
+app.use(express.json()); // Middleware to parse JSON requests
 
 // Connect to MongoDB
 connectDB();
@@ -17,17 +19,7 @@ const server = http.createServer(app);
 setupWebSocket(server);
 
 // API to mark notifications as read
-app.put("/notifications/read/:userId", async (req, res) => {
-  try {
-    await Notification.updateMany(
-      { userId: req.params.userId, status: "unread" },
-      { status: "read" }
-    );
-    res.json({ message: "All notifications marked as read" });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
+app.put("/notifications/read/:userId", markNotificationsAsRead);
 
 app.get("/", (req, res) => {
   res.send("WebSocket server is running!");
