@@ -4,7 +4,7 @@ const http = require("http");
 const cors = require("cors");
 const connectDB = require("./db/dbConnect"); // Import the database connection
 const { setupWebSocket } = require("./service/notiService"); // Import WebSocket service
-const { markNotificationsAsRead } = require("./service/notificationService"); // Import notification service
+const { markNotificationsAsRead } = require("./service/notiService"); // Import notification service
 
 const app = express();
 app.use(cors());
